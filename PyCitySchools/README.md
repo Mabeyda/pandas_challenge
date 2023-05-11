@@ -1,13 +1,14 @@
 
 # PyCity Schools Analysis
 
-Average math and reading scores stay consistent across grade level when grouped by school.  There is no major improvement in scores from any school.
-Math passing rates are always consistently lower across every metric, but the difference between math and reading passing rates is greater amoung lower performing schools, large schools, and higher spending per student which all seem to correlate.  
-The top 5 schools are all charter schools while the bottom 5 all district schools. 
-The percentage of Math decrease from 75 % to 74.8%
-The overall Passing went from 65 - 64.9%
-Average Math at Thomas High School decreased from 83.42 to 83.35%
-Average Reading at Thomas High School increased from 83.84 to 83.89%
+-Average math and reading scores stay consistent across grade level when grouped by school.
+-There is no major improvement in scores from any school.
+-Math passing rates are always consistently lower across every metric, but the difference between math and reading passing rates is greater amoung lower performing schools, large schools, and higher spending per student which all seem to correlate.  
+-The top 5 schools are all charter schools while the bottom 5 all district schools. 
+-The percentage of Math decrease from 75 % to 74.8%
+-The overall Passing went from 65 - 64.9%
+-Average Math at Thomas High School decreased from 83.42 to 83.35%
+-Average Reading at Thomas High School increased from 83.84 to 83.89%
 
 
 
