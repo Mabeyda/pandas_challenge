@@ -15,25 +15,21 @@
 
 
 ```python
-#Dependencies
+# Dependencies and Setup
 import pandas as pd
-import numpy as np
-import os
+from pathlib import Path
 
-# define file path
-schools_file = os.path.join('Resources','schools_complete.csv')
-students_file = os.path.join('Resources', 'students_complete.csv')
+# File to Load (Remember to Change These)
+school_data_to_load = Path("Resources/schools_complete.csv")
+student_data_to_load = Path("Resources/students_complete.csv")
 
-# read schools file
-schools_df = pd.read_csv(schools_file)
+# Read School and Student Data File and store into Pandas DataFrames
+school_data = pd.read_csv(school_data_to_load)
+student_data = pd.read_csv(student_data_to_load)
 
-#read student file
-students_df = pd.read_csv(students_file)
-
-#renames for merge
-schools_df.rename(columns = {'name': 'school'}, inplace = True)
-
-merged_df = students_df.merge(schools_df, how = 'left', on = 'school')
+# Combine the data into a single dataset.  
+school_data_complete = pd.merge(student_data, school_data, how="left", on=["school_name", "school_name"])
+school_data_complete.head()
 
 
 ```
@@ -42,28 +38,32 @@ merged_df = students_df.merge(schools_df, how = 'left', on = 'school')
 
 
 ```python
-#create array of unique school names
-unique_school_names = schools_df['school'].unique()
+# Calculate the total number of unique schools
+total_schools = len(school_data_complete.school_name.unique())
+print(total_schools)
 
-#gives the length of unique school names to give us how many schools
-school_count = len(unique_school_names)
 
-#district student count
-dist_student_count = schools_df['size'].sum()
+# Calculate the total number of students
+total_students = school_data_complete['student_name'].count()
+print(total_students)
 
-#student count from student file (to verify with district student count)
-total_student_rec = students_df['name'].count()
+# Calculate the total budget
+total_budget = sum(school_data_complete['budget'].unique())
+print(total_budget)
 
-#total budget
-total_budget = schools_df['budget'].sum()
+# Calculate the average (mean) math score
+average_math_score = school_data_complete["math_score"].mean()
+print(average_math_score)
 
-#calculations for number and % passing reading
-num_passing_reading = students_df.loc[students_df['reading_score'] >= 70]['reading_score'].count()
-perc_pass_reading = num_passing_reading/total_student_rec
+# Calculate the average (mean) reading score
+average_reading_score = school_data_complete["reading_score"].mean()
+print(average_reading_score)
 
-#calculations for number and % passing math
-num_passing_math = students_df.loc[students_df['math_score'] >= 70]['math_score'].count()
-perc_pass_math = num_passing_math/total_student_rec
+# Use the following to calculate the percentage of students who passed math (math scores greather than or equal to 70)
+students_passing_math = school_data_complete.loc[school_data_complete["math_score"] >= 70]
+number_students_passing_math = students_passing_math["Student ID"].count()
+percent_passing_math = (number_students_passing_math / total_students) * 100
+percent_passing_math
 
 #average math score calculation
 avg_math_score = students_df['math_score'].mean()
@@ -71,43 +71,37 @@ avg_math_score = students_df['math_score'].mean()
 #average reading score calculation
 avg_reading_score = students_df['reading_score'].mean()
 
-#Overall Passing Rate Calculations
-overall_pass = students_df[(students_df['math_score'] >= 70) & (students_df['reading_score'] >= 70)]['name'].count()/total_student_rec
+# Calculate the percentage of students who passed reading (hint: look at how the math percentage was calculated)  
+students_passing_reading = school_data_complete.loc[school_data_complete["reading_score"] >= 70]
+number_students_passing_reading = students_passing_reading["Student ID"].count()
+percent_passing_reading = (number_students_passing_reading / total_students) * 100
+percent_passing_reading
+
+# Use the following to calculate the percentage of students that passed math and reading
+overall_passing_rate = school_data_complete[(school_data_complete['math_score'] >= 70) & (school_data_complete['reading_score'] >= 70)]['Student ID'].count()/total_students*100
+
+print(overall_passing_rate)
 
 # district dataframe from dictionary
 
 district_summary = pd.DataFrame({
-    
-    "Total Schools": [school_count],
-    "Total Students": [dist_student_count],
-    "Total Budget": [total_budget],
-    "Average Reading Score": [avg_reading_score],
-    "Average Math Score": [avg_math_score],
-    "% Passing Reading":[perc_pass_reading],
-    "% Passing Math": [perc_pass_math],
-    "Overall Passing Rate": [overall_pass]
+  # Create a high-level snapshot of the district's key metrics in a DataFrame
+district_summary = pd.DataFrame({"Total Schools":[total_schools],
+                                 "Total Students":[total_students],
+                                 "Total Budget":[total_budget],
+                                 "Average Math Score":[average_math_score],
+                                 "Average Reading Score":[average_reading_score],
+                                 "% Passing Math":[percent_passing_math],
+                                 "% Passing Reading":[percent_passing_reading],
+                                 "% Overall Passing Rate":[overall_passing_rate]})
 
-})
-
-#store as different df to change order
-dist_sum = district_summary[["Total Schools", 
-                             "Total Students", 
-                             "Total Budget", 
-                             "Average Reading Score", 
-                             "Average Math Score", 
-                             '% Passing Reading', 
-                             '% Passing Math', 
-                             'Overall Passing Rate']]
-
-#format cells
-dist_sum.style.format({"Total Budget": "${:,.2f}", 
-                       "Average Reading Score": "{:.1f}", 
-                       "Average Math Score": "{:.1f}", 
-                       "% Passing Math": "{:.1%}", 
-                       "% Passing Reading": "{:.1%}", 
-                       "Overall Passing Rate": "{:.1%}"})
-```
-
+# Reformat Total Students and Total Budget
+district_summary['Total Students'] = district_summary.apply(lambda x: "{:,.0f}".format(x['Total Students']), axis=1)
+district_summary['Total Budget'] = district_summary.apply(lambda x: "${:,.2f}".format(x['Total Budget']), axis=1)
+district_summary["% Passing Math"] = district_summary.apply(lambda x:"{:.6f}".format(x["% Passing Math"]), axis=1)
+                                                 
+# Print Summary Dataframe
+district_summary
 
 
 
